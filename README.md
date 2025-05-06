@@ -137,6 +137,76 @@ print('测试验证结果: ${verified ? "成功" : "失败"}');
 
 完整示例可参考 `example` 目录下的示例项目。
 
+## 项目结构
+
+```text
+flutter_biometric/
+├── android/                  # Android 原生插件实现
+├── example/                  # 示例应用
+├── lib/
+│   ├── flutter_biometric.dart  # 旧版插件主入口（向后兼容）
+│   └── src/                  # 新版功能分层目录
+│       ├── biometric/        # BiometricService 和 BiometricManager
+│       ├── ui/               # Flutter UI 页面
+│       └── utils/            # 公用工具类 (BiometricUtils)
+├── pubspec.yaml
+└── README.md
+```
+
+## 功能分层
+
+- **Service 层（`src/biometric/biometric_service.dart`）**
+  - 封装 `local_auth` 插件，仅与系统生物识别 API 交互。
+  - 提供设备支持检查、获取生物识别类型、原子级验证接口。
+
+- **Manager 层（`src/biometric/biometric_manager.dart`）**
+  - 协调 Service 层与原生插件功能。
+  - 实现高级业务逻辑（例如录入前验证、操作后刷新）。
+
+- **UI 层（`src/ui/`）**
+  - `FingerprintManagementPage`：指纹管理 Flutter 页面。
+  - 状态展示、操作入口、错误提示等。
+
+- **工具类（`src/utils/biometric_utils.dart`）**
+  - 用户友好名称、图标映射、哈希格式化等辅助方法。
+
+## 基础调用策略
+
+1. **初始化**：
+   ```dart
+   final manager = BiometricManager();
+   ```
+
+2. **检查设备状态**：
+   ```dart
+   final status = await manager.checkBiometricStatus();
+   if (status == BiometricStatus.available) {
+     // 生物识别可用
+   }
+   ```
+
+3. **身份验证**：
+   ```dart
+   bool ok = await manager.authenticate(reason: '验证您的身份');
+   ```
+
+4. **指纹管理**：
+   - 添加：`await manager.addFingerprint();`
+   - 删除：`await manager.deleteFingerprint(index);`
+   - 清除：`await manager.clearAllFingerprints();`
+   - 打开系统/原生管理界面：`await manager.showFingerprintSettings(context);`
+
+## 系统流程图
+
+```mermaid
+flowchart TD
+  UI[Flutter UI] -->|调用| Manager(BiometricManager)
+  Manager -->|本地验证| Service(BiometricService)
+  Service -->|系统Biometric API| local_auth[local_auth]
+  Manager -->|原生管理| Plugin(FlutterBiometric)
+  Plugin -->|Platform Channel| Native[Android 生物识别]
+```
+
 ## 许可证
 
 MIT License
