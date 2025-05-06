@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.BiometricAuth" parent="Theme.MaterialComponents.Light.DarkActionBar">
+        <item name="colorPrimary">@color/biometric_primary</item>
+        <item name="colorPrimaryVariant">@color/biometric_primary_variant</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorSecondary">@color/biometric_secondary</item>
+        <item name="colorSecondaryVariant">@color/biometric_secondary_variant</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+    </style>
+    
+    <style name="Theme.BiometricAuth.NoActionBar" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="colorPrimary">@color/biometric_primary</item>
+        <item name="colorPrimaryVariant">@color/biometric_primary_variant</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorSecondary">@color/biometric_secondary</item>
+        <item name="colorSecondaryVariant">@color/biometric_secondary_variant</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+</resources> 

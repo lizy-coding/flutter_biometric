@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="120"
+    android:viewportHeight="120">
+    
+    <!-- 外圆 -->
+    <path
+        android:pathData="M60,60m-58,0a58,58 0,1 1,116 0a58,58 0,1 1,-116 0"
+        android:strokeWidth="4"
+        android:strokeColor="#FFFFFF"
+        android:fillColor="#00000000"/>
+    
+    <!-- 人脸简化图形 -->
+    <path
+        android:pathData="M60,40 A20,20 0 0,1 80,60 A20,20 0 0,1 60,80 A20,20 0 0,1 40,60 A20,20 0 0,1 60,40z"
+        android:strokeWidth="2"
+        android:strokeColor="#FFFFFF"
+        android:fillColor="#00000000"/>
+    
+    <!-- 眼睛 -->
+    <path
+        android:pathData="M50,55m-3,0a3,3 0,1 1,6 0a3,3 0,1 1,-6 0"
+        android:fillColor="#FFFFFF"/>
+    <path
+        android:pathData="M70,55m-3,0a3,3 0,1 1,6 0a3,3 0,1 1,-6 0"
+        android:fillColor="#FFFFFF"/>
+    
+    <!-- 嘴巴 -->
+    <path
+        android:pathData="M50,65 Q60,75 70,65"
+        android:strokeWidth="2"
+        android:strokeColor="#FFFFFF"
+        android:fillColor="#00000000"/>
+</vector> 

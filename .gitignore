@@ -1,0 +1,51 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.build/
+.buildlog/
+.history
+.svn/
+.swiftpm/
+migrate_working_dir/
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# VS Code (可选)
+.vscode/
+
+# Flutter/Dart/Pub related
+/pubspec.lock
+**/doc/api/
+/.dart_tool/
+/.flutter-plugins
+/.flutter-plugins-dependencies
+/.packages
+
+# Flutter generated plugin registrant
+**/generated_plugin_registrant.dart
+
+# 忽略所有构建产物
+**/build/
+
+# 忽略Gradle缓存和中间产物
+**/.gradle/
+
+# 忽略本地配置文件
+**/local.properties
+
+# 添加忽略生成产物、工具目录和IDE配置
+**/build/
+**/local.properties
+
+# IDE 配置文件
+**/idea/
+**/*.iml
+**/vscode/
