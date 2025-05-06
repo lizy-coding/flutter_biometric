@@ -1,5 +1,15 @@
 import 'flutter_biometric_platform_interface.dart';
 
+// 导出原始插件API
+export 'flutter_biometric_platform_interface.dart';
+
+// 导出新的生物识别组件结构
+export 'src/flutter_biometric.dart';
+
+/// 原始生物识别插件类
+/// 
+/// 为了保持兼容性，保留原始API
+/// 新项目应使用 BiometricManager 类
 class FlutterBiometric {
   /// 获取平台版本信息
   Future<String?> getPlatformVersion() {
