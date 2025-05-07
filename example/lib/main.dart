@@ -69,17 +69,45 @@ class _MyAppState extends State<MyApp> {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
       ),
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('指纹生物识别示例'),
-          backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-        ),
-        body: _buildBody(),
+      home: HomePage(
+        platformVersion: _platformVersion,
+        isSupported: _isSupported,
+        biometricStatus: _biometricStatus,
+        availableBiometrics: _availableBiometrics,
+        biometricManager: _biometricManager,
       ),
     );
   }
+}
 
-  Widget _buildBody() {
+class HomePage extends StatelessWidget {
+  final String platformVersion;
+  final bool isSupported;
+  final BiometricStatus biometricStatus;
+  final List<BiometricType> availableBiometrics;
+  final BiometricManager biometricManager;
+
+  const HomePage({
+    super.key,
+    required this.platformVersion,
+    required this.isSupported,
+    required this.biometricStatus,
+    required this.availableBiometrics,
+    required this.biometricManager,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('指纹生物识别示例'),
+        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+      ),
+      body: _buildBody(context),
+    );
+  }
+
+  Widget _buildBody(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -99,14 +127,14 @@ class _MyAppState extends State<MyApp> {
                         fontWeight: FontWeight.bold
                       )),
                   const SizedBox(height: 8),
-                  Text('平台版本: $_platformVersion'),
-                  Text('生物识别支持: ${_isSupported ? "支持" : "不支持"}'),
+                  Text('平台版本: $platformVersion'),
+                  Text('生物识别支持: ${isSupported ? "支持" : "不支持"}'),
                   Text('生物识别状态: ${_getBiometricStatusText()}'),
                   const SizedBox(height: 8),
-                  if (_availableBiometrics.isNotEmpty) ...[
+                  if (availableBiometrics.isNotEmpty) ...[
                     const Text('可用生物识别类型:'),
                     const SizedBox(height: 4),
-                    ..._availableBiometrics.map((type) => 
+                    ...availableBiometrics.map((type) => 
                       Padding(
                         padding: const EdgeInsets.only(left: 8.0, bottom: 4.0),
                         child: Row(
@@ -118,7 +146,7 @@ class _MyAppState extends State<MyApp> {
                         ),
                       )
                     ),
-                  ] else if (_isSupported) 
+                  ] else if (isSupported) 
                     const Text('未设置任何生物识别'),
                 ],
               ),
@@ -129,7 +157,7 @@ class _MyAppState extends State<MyApp> {
           
           // 操作按钮
           ElevatedButton.icon(
-            onPressed: _authenticate,
+            onPressed: () => _authenticate(context),
             icon: const Icon(Icons.fingerprint),
             label: const Text('测试生物识别验证'),
             style: ElevatedButton.styleFrom(
@@ -140,7 +168,7 @@ class _MyAppState extends State<MyApp> {
           const SizedBox(height: 12),
           
           ElevatedButton.icon(
-            onPressed: _navigateToFingerprintManagement,
+            onPressed: () => _navigateToFingerprintManagement(context),
             icon: const Icon(Icons.settings),
             label: const Text('指纹管理界面'),
             style: ElevatedButton.styleFrom(
@@ -150,7 +178,7 @@ class _MyAppState extends State<MyApp> {
           
           const SizedBox(height: 24),
           
-          if (_biometricStatus == BiometricStatus.notEnrolled)
+          if (biometricStatus == BiometricStatus.notEnrolled)
             const Card(
               color: Colors.amber,
               child: Padding(
@@ -168,7 +196,7 @@ class _MyAppState extends State<MyApp> {
               ),
             ),
           
-          if (_biometricStatus == BiometricStatus.unsupported)
+          if (biometricStatus == BiometricStatus.unsupported)
             const Card(
               color: Colors.red,
               child: Padding(
@@ -196,7 +224,7 @@ class _MyAppState extends State<MyApp> {
   }
 
   String _getBiometricStatusText() {
-    switch (_biometricStatus) {
+    switch (biometricStatus) {
       case BiometricStatus.available:
         return '可用';
       case BiometricStatus.notEnrolled:
@@ -208,19 +236,19 @@ class _MyAppState extends State<MyApp> {
     }
   }
   
-  Future<void> _authenticate() async {
+  Future<void> _authenticate(BuildContext context) async {
     try {
-      final result = await _biometricManager.authenticate(
+      final result = await biometricManager.authenticate(
         reason: '请验证您的身份以继续',
       );
       
-      if (mounted) {
+      if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('验证${result ? '成功' : '失败'}')),
         );
       }
     } catch (e) {
-      if (mounted) {
+      if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('验证过程出错: $e')),
         );
@@ -228,7 +256,7 @@ class _MyAppState extends State<MyApp> {
     }
   }
   
-  void _navigateToFingerprintManagement() {
+  void _navigateToFingerprintManagement(BuildContext context) {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => const FingerprintManagementPage(),

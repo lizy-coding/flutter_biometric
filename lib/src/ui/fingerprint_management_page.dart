@@ -3,7 +3,7 @@ import '../biometric/biometric_manager.dart';
 
 /// 指纹管理页面
 class FingerprintManagementPage extends StatefulWidget {
-  const FingerprintManagementPage({Key? key}) : super(key: key);
+  const FingerprintManagementPage({super.key});
 
   @override
   State<FingerprintManagementPage> createState() => _FingerprintManagementPageState();
@@ -148,8 +148,19 @@ class _FingerprintManagementPageState extends State<FingerprintManagementPage> {
     );
   }
 
-  void _showNativeSettings() {
-    _biometricManager.showFingerprintSettings(context);
+  void _showNativeSettings() async {
+    try {
+      // 尝试显示原生指纹管理界面
+      await _biometricManager.showFingerprintSettings(context);
+    } catch (e) {
+      // 如果失败，则显示对话框提示用户
+      if (mounted) {
+        _showErrorDialog(
+          '无法打开指纹管理',
+          '无法打开原生指纹管理界面，请前往系统设置手动管理指纹。'
+        );
+      }
+    }
   }
 
   @override
