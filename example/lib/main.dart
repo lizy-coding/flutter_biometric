@@ -3,7 +3,10 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_biometric/flutter_biometric.dart';
-import 'package:local_auth/local_auth.dart' show BiometricType;
+import 'package:flutter_biometric_example/face_image_demo_page.dart'
+    show FaceImageDemoPage;
+import 'package:flutter_biometric_example/fireworks_dialog.dart'
+    show FireworksDialog;
 
 void main() {
   runApp(const MyApp());
@@ -35,15 +38,17 @@ class _MyAppState extends State<MyApp> {
     bool isSupported = false;
     BiometricStatus biometricStatus = BiometricStatus.unsupported;
     List<BiometricType> availableBiometrics = [];
-    
+
     try {
       final flutterBiometricPlugin = FlutterBiometric();
-      platformVersion = await flutterBiometricPlugin.getPlatformVersion() ?? 'Unknown platform version';
-      
+      platformVersion =
+          await flutterBiometricPlugin.getPlatformVersion() ??
+          'Unknown platform version';
+
       // 检查生物识别状态
       biometricStatus = await _biometricManager.checkBiometricStatus();
       isSupported = biometricStatus != BiometricStatus.unsupported;
-      
+
       // 获取可用的生物识别类型
       if (isSupported) {
         availableBiometrics = await _biometricManager.getAvailableBiometrics();
@@ -100,10 +105,19 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('指纹生物识别示例'),
+        title: const Text('指纹/人脸生物识别示例'),
         backgroundColor: Theme.of(context).colorScheme.primaryContainer,
       ),
       body: _buildBody(context),
+      floatingActionButton: FloatingActionButton.extended(
+        icon: const Icon(Icons.face),
+        label: const Text('人脸图像输出演示'),
+        onPressed: () {
+          Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (_) => const FaceImageDemoPage()));
+        },
+      ),
     );
   }
 
@@ -121,11 +135,10 @@ class HomePage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('设备信息', 
-                      style: TextStyle(
-                        fontSize: 18, 
-                        fontWeight: FontWeight.bold
-                      )),
+                  const Text(
+                    '设备信息',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
                   const SizedBox(height: 8),
                   Text('平台版本: $platformVersion'),
                   Text('生物识别支持: ${isSupported ? "支持" : "不支持"}'),
@@ -134,50 +147,49 @@ class HomePage extends StatelessWidget {
                   if (availableBiometrics.isNotEmpty) ...[
                     const Text('可用生物识别类型:'),
                     const SizedBox(height: 4),
-                    ...availableBiometrics.map((type) => 
-                      Padding(
+                    ...availableBiometrics.map(
+                      (type) => Padding(
                         padding: const EdgeInsets.only(left: 8.0, bottom: 4.0),
                         child: Row(
                           children: [
-                            Icon(BiometricUtils.getBiometricTypeIcon(type), size: 16),
+                            Icon(
+                              BiometricUtils.getBiometricTypeIcon(type),
+                              size: 16,
+                            ),
                             const SizedBox(width: 8),
                             Text(BiometricUtils.getBiometricTypeName(type)),
                           ],
                         ),
-                      )
+                      ),
                     ),
-                  ] else if (isSupported) 
+                  ] else if (isSupported)
                     const Text('未设置任何生物识别'),
                 ],
               ),
             ),
           ),
-          
+
           const SizedBox(height: 24),
-          
+
           // 操作按钮
           ElevatedButton.icon(
             onPressed: () => _authenticate(context),
             icon: const Icon(Icons.fingerprint),
             label: const Text('测试生物识别验证'),
-            style: ElevatedButton.styleFrom(
-              padding: const EdgeInsets.all(12),
-            ),
+            style: ElevatedButton.styleFrom(padding: const EdgeInsets.all(12)),
           ),
-          
+
           const SizedBox(height: 12),
-          
+
           ElevatedButton.icon(
             onPressed: () => _navigateToFingerprintManagement(context),
             icon: const Icon(Icons.settings),
             label: const Text('指纹管理界面'),
-            style: ElevatedButton.styleFrom(
-              padding: const EdgeInsets.all(12),
-            ),
+            style: ElevatedButton.styleFrom(padding: const EdgeInsets.all(12)),
           ),
-          
+
           const SizedBox(height: 24),
-          
+
           if (biometricStatus == BiometricStatus.notEnrolled)
             const Card(
               color: Colors.amber,
@@ -187,15 +199,20 @@ class HomePage extends StatelessWidget {
                   children: [
                     Icon(Icons.info_outline, size: 36),
                     SizedBox(height: 8),
-                    Text('您尚未设置生物识别', 
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    Text(
+                      '您尚未设置生物识别',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                     SizedBox(height: 4),
                     Text('请在指纹管理界面添加生物识别'),
                   ],
                 ),
               ),
             ),
-          
+
           if (biometricStatus == BiometricStatus.unsupported)
             const Card(
               color: Colors.red,
@@ -205,15 +222,19 @@ class HomePage extends StatelessWidget {
                   children: [
                     Icon(Icons.error_outline, color: Colors.white, size: 36),
                     SizedBox(height: 8),
-                    Text('您的设备不支持生物识别', 
+                    Text(
+                      '您的设备不支持生物识别',
                       style: TextStyle(
-                        fontSize: 16, 
+                        fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white
-                      )),
+                        color: Colors.white,
+                      ),
+                    ),
                     SizedBox(height: 4),
-                    Text('请使用其他方式进行身份验证',
-                      style: TextStyle(color: Colors.white)),
+                    Text(
+                      '请使用其他方式进行身份验证',
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ],
                 ),
               ),
@@ -235,27 +256,31 @@ class HomePage extends StatelessWidget {
         return '未知';
     }
   }
-  
+
   Future<void> _authenticate(BuildContext context) async {
     try {
-      final result = await biometricManager.authenticate(
-        reason: '请验证您的身份以继续',
-      );
-      
+      final result = await biometricManager.authenticate(reason: '请验证您的身份以继续');
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('验证${result ? '成功' : '失败'}')),
-        );
+        if (result) {
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (_) => const FireworksDialog(),
+          );
+        }
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('验证${result ? '成功' : '失败'}')));
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('验证过程出错: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('验证过程出错: $e')));
       }
     }
   }
-  
+
   void _navigateToFingerprintManagement(BuildContext context) {
     Navigator.of(context).push(
       MaterialPageRoute(

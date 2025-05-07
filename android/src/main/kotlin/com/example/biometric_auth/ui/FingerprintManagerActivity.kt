@@ -381,7 +381,7 @@ class FingerprintManagerActivity : AppCompatActivity() {
             showAddFingerprintDialog()
         }
     }
-    
+
     // 在类中添加ActivityResultLauncher
     private val fingerprintEnrollmentLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
