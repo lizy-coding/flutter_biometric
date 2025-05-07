@@ -3,10 +3,9 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_biometric/flutter_biometric.dart';
-import 'package:flutter_biometric_example/face_image_demo_page.dart'
-    show FaceImageDemoPage;
 import 'package:flutter_biometric_example/fireworks_dialog.dart'
     show FireworksDialog;
+import 'package:flutter_biometric_example/face_image_capture.dart';
 
 void main() {
   runApp(const MyApp());
@@ -111,11 +110,11 @@ class HomePage extends StatelessWidget {
       body: _buildBody(context),
       floatingActionButton: FloatingActionButton.extended(
         icon: const Icon(Icons.face),
-        label: const Text('人脸图像输出演示'),
+        label: const Text('人脸采集'),
         onPressed: () {
-          Navigator.of(
-            context,
-          ).push(MaterialPageRoute(builder: (_) => const FaceImageDemoPage()));
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const FaceImageCapturePage()),
+          );
         },
       ),
     );
