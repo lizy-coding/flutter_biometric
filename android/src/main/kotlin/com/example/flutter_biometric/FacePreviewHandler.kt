@@ -39,14 +39,19 @@ class FacePreviewHandler(
      * 启动人脸预览
      * @return 纹理ID，用于Flutter侧显示相机预览
      */
-    suspend fun startPreview(): Int = suspendCoroutine { continuation ->
+    suspend fun startPreview(quality: String?): Int = suspendCoroutine { continuation ->
         try {
             // 获取纹理入口
             textureEntry = textureRegistry.createSurfaceTexture()
             val surfaceTexture = textureEntry?.surfaceTexture()
             
-            // 设置预览尺寸
-            surfaceTexture?.setDefaultBufferSize(640, 480)
+            // 根据画质参数设置分辨率
+            val (width, height) = when (quality) {
+                "high" -> 1920 to 1080
+                "medium" -> 1280 to 960
+                else -> 640 to 480
+            }
+            surfaceTexture?.setDefaultBufferSize(width, height)
             previewSurface = Surface(surfaceTexture)
             
             // 获取相机提供者
@@ -57,7 +62,7 @@ class FacePreviewHandler(
                     
                     // 配置相机用例
                     val preview = Preview.Builder()
-                        .setTargetResolution(Size(640, 480))
+                        .setTargetResolution(Size(width, height))
                         .build()
                     
                     // 修正SurfaceProvider的设置
@@ -74,7 +79,7 @@ class FacePreviewHandler(
                     
                     // 配置图像分析
                     val imageAnalysis = ImageAnalysis.Builder()
-                        .setTargetResolution(Size(640, 480))
+                        .setTargetResolution(Size(width, height))
                         .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                         .build()
                         .apply {

@@ -1,7 +1,6 @@
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_biometric/src/face/face_image_output.dart';
+import 'package:flutter_biometric/flutter_biometric.dart' show FaceImageOutput;
 
 class FaceImageCapturePage extends StatefulWidget {
   const FaceImageCapturePage({super.key});
@@ -17,15 +16,16 @@ class _FaceImageCapturePageState extends State<FaceImageCapturePage> {
   Future<void> _captureFace() async {
     setState(() => _loading = true);
     try {
-      final bytes = await const MethodChannel('face_channel')
-          .invokeMethod<Uint8List>('captureFaceImage');
+      final bytes = await const MethodChannel(
+        'face_channel',
+      ).invokeMethod<Uint8List>('captureFaceImage');
       if (bytes != null) {
         setState(() => _imageBytes = bytes);
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('采集失败: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('采集失败: $e')));
     } finally {
       setState(() => _loading = false);
     }
@@ -36,22 +36,24 @@ class _FaceImageCapturePageState extends State<FaceImageCapturePage> {
     return Scaffold(
       appBar: AppBar(title: const Text('人脸采集')),
       body: Center(
-        child: _imageBytes == null
-            ? _loading
-                ? const CircularProgressIndicator()
-                : ElevatedButton.icon(
-                    icon: const Icon(Icons.camera_alt),
-                    label: const Text('采集人脸'),
-                    onPressed: _captureFace,
-                  )
-            : FaceImageOutput(imageBytes: _imageBytes!),
+        child:
+            _imageBytes == null
+                ? _loading
+                    ? const CircularProgressIndicator()
+                    : ElevatedButton.icon(
+                      icon: const Icon(Icons.camera_alt),
+                      label: const Text('采集人脸'),
+                      onPressed: _captureFace,
+                    )
+                : FaceImageOutput(imageBytes: _imageBytes!),
       ),
-      floatingActionButton: _imageBytes != null
-          ? FloatingActionButton(
-              child: const Icon(Icons.refresh),
-              onPressed: () => setState(() => _imageBytes = null),
-            )
-          : null,
+      floatingActionButton:
+          _imageBytes != null
+              ? FloatingActionButton(
+                child: const Icon(Icons.refresh),
+                onPressed: () => setState(() => _imageBytes = null),
+              )
+              : null,
     );
   }
 }

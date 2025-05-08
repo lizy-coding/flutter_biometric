@@ -126,6 +126,7 @@ class FlutterBiometricPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
           return
         }
         
+        val quality = call.argument<String>("quality")
         coroutineScope.launch {
           try {
             facePreviewHandler?.stopPreview()
@@ -133,7 +134,7 @@ class FlutterBiometricPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             facePreviewHandler = FacePreviewHandler(context, activity!!, textureRegistry)
             
             val textureId = withContext(Dispatchers.IO) {
-              facePreviewHandler?.startPreview() ?: -1
+              facePreviewHandler?.startPreview(quality) ?: -1
             }
             
             if (textureId >= 0) {

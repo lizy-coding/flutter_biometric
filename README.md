@@ -1,5 +1,34 @@
 # Flutter 生物识别模块
 
+## 包结构（lib/）
+
+```
+lib/
+├── flutter_biometric.dart                # 插件主入口
+├── flutter_biometric_method_channel.dart # MethodChannel 实现
+├── flutter_biometric_platform_interface.dart # 平台接口定义
+└── src/
+    ├── flutter_biometric.dart            # 结构导出
+    ├── biometric/
+    │   ├── biometric_manager.dart        # 生物识别业务管理
+    │   └── biometric_service.dart        # 生物识别服务封装
+    ├── face/
+    │   ├── face_manager.dart             # 人脸业务管理
+    │   ├── face_service.dart             # 人脸原生通信
+    │   ├── face_preview_manager.dart     # 人脸预览管理
+    │   ├── face_preview_page.dart        # 人脸预览页面
+    │   ├── face_mask_overlay.dart        # 人脸遮罩组件
+    │   └── face_image_output.dart        # 人脸图片输出
+    ├── ui/
+    │   ├── face_preview_page.dart        # UI: 人脸预览页面（可选）
+    │   ├── face_mask_overlay.dart        # UI: 遮罩组件（可选）
+    │   ├── face_capture_page.dart        # UI: 人脸采集页面
+    │   ├── face_circle_painter.dart      # UI: 圆形区域绘制
+    │   └── fingerprint_management_page.dart # UI: 指纹管理页面
+    └── utils/
+        └── biometric_utils.dart          # 工具类
+```
+
 ## 快速开始
 
 1. 在 pubspec.yaml 添加依赖：
