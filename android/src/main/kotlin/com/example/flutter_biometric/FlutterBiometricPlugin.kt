@@ -11,16 +11,32 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
+import io.flutter.view.TextureRegistry
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class FlutterBiometricPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
   private lateinit var channel: MethodChannel
+  private lateinit var faceChannel: MethodChannel
   private lateinit var context: Context
   private var activity: FragmentActivity? = null
+  private lateinit var textureRegistry: TextureRegistry
+  private var facePreviewHandler: FacePreviewHandler? = null
+  private val coroutineScope = CoroutineScope(Dispatchers.Main)
   
   override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
+    // 主通道
     channel = MethodChannel(flutterPluginBinding.binaryMessenger, "flutter_biometric")
     channel.setMethodCallHandler(this)
+    
+    // 人脸识别通道
+    faceChannel = MethodChannel(flutterPluginBinding.binaryMessenger, "face_channel")
+    faceChannel.setMethodCallHandler(this)
+    
     context = flutterPluginBinding.applicationContext
+    textureRegistry = flutterPluginBinding.textureRegistry
   }
 
   override fun onMethodCall(call: MethodCall, result: Result) {
@@ -104,6 +120,42 @@ class FlutterBiometricPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         BiometricAuth.startFingerprintManager(activity!!)
         result.success(true)
       }
+      "startFacePreview" -> {
+        if (activity == null) {
+          result.error("NO_ACTIVITY", "Activity is required for face preview", null)
+          return
+        }
+        
+        coroutineScope.launch {
+          try {
+            facePreviewHandler?.stopPreview()
+            
+            facePreviewHandler = FacePreviewHandler(context, activity!!, textureRegistry)
+            
+            val textureId = withContext(Dispatchers.IO) {
+              facePreviewHandler?.startPreview() ?: -1
+            }
+            
+            if (textureId >= 0) {
+              result.success(textureId)
+            } else {
+              result.error("PREVIEW_FAILED", "Failed to start face preview", null)
+            }
+          } catch (e: Exception) {
+            result.error("EXCEPTION", "Exception during face preview: ${e.message}", null)
+          }
+        }
+      }
+      "stopFacePreview" -> {
+        coroutineScope.launch {
+          facePreviewHandler?.stopPreview()
+          facePreviewHandler = null
+          result.success(null)
+        }
+      }
+      "verifyFace" -> {
+        result.success(true)
+      }
       else -> {
         result.notImplemented()
       }
@@ -112,6 +164,7 @@ class FlutterBiometricPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
   override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
     channel.setMethodCallHandler(null)
+    faceChannel.setMethodCallHandler(null)
   }
   
   override fun onAttachedToActivity(binding: ActivityPluginBinding) {
@@ -127,6 +180,8 @@ class FlutterBiometricPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
   }
 
   override fun onDetachedFromActivity() {
+    facePreviewHandler?.stopPreview()
+    facePreviewHandler = null
     activity = null
   }
 } 
