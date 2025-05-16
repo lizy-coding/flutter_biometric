@@ -105,6 +105,8 @@ Navigator.push(
 - 测试功能支持
 - **指纹验证成功后自动播放烟花动画（纯 Flutter 绘制，无需外部资源）**
 - **人脸预览与验证（原生采集，Flutter 渲染圆形遮罩）**
+- **Network connectivity status monitoring**
+- **Bluetooth status monitoring**
 
 ## 人脸识别/预览功能说明
 
@@ -148,5 +150,28 @@ FaceMaskOverlay(
   hintText: '请将脸部放在框内',
 ),
 ```
+
+## Connectivity Monitoring
+
+```dart
+import 'package:flutter_biometric/connectivity_service.dart';
+
+final connectivity = ConnectivityService();
+
+// Check network status
+bool isNetworkAvailable = await connectivity.isNetworkAvailable();
+
+// Check Bluetooth status
+bool isBluetoothAvailable = await connectivity.isBluetoothAvailable();
+```
+
+## Example App
+
+The example app demonstrates both biometric authentication and connectivity monitoring:
+
+- Shows current network status (available/unavailable)
+- Shows current Bluetooth status (available/unavailable)
+- Updates in real-time when connectivity changes
+- Manual refresh button to check current status
 
 ## 其他功能与架构请参考原有文档
