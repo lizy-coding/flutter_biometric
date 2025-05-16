@@ -3,6 +3,7 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_biometric/flutter_biometric.dart';
+import 'package:flutter_biometric/connectivity_service.dart';
 import 'package:flutter_biometric_example/fireworks_dialog.dart'
     show FireworksDialog;
 import 'package:flutter_biometric_example/face_image_capture.dart';
@@ -24,11 +25,19 @@ class _MyAppState extends State<MyApp> {
   bool _isSupported = false;
   List<BiometricType> _availableBiometrics = [];
   BiometricStatus _biometricStatus = BiometricStatus.unsupported;
+  bool _networkAvailable = false;
+  bool _bluetoothAvailable = false;
+  final _connectivityService = ConnectivityService();
 
   @override
   void initState() {
     super.initState();
     initPlatformState();
+    _checkConnectivity();
+    // Set up periodic connectivity check
+    Timer.periodic(const Duration(seconds: 5), (_) {
+      _checkConnectivity();
+    });
   }
 
   // 初始化平台状态
@@ -66,6 +75,16 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
+  Future<void> _checkConnectivity() async {
+    final networkAvailable = await _connectivityService.isNetworkAvailable();
+    final bluetoothAvailable = await _connectivityService.isBluetoothAvailable();
+    
+    setState(() {
+      _networkAvailable = networkAvailable;
+      _bluetoothAvailable = bluetoothAvailable;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -79,6 +98,8 @@ class _MyAppState extends State<MyApp> {
         biometricStatus: _biometricStatus,
         availableBiometrics: _availableBiometrics,
         biometricManager: _biometricManager,
+        networkAvailable: _networkAvailable,
+        bluetoothAvailable: _bluetoothAvailable,
       ),
     );
   }
@@ -90,6 +111,8 @@ class HomePage extends StatelessWidget {
   final BiometricStatus biometricStatus;
   final List<BiometricType> availableBiometrics;
   final BiometricManager biometricManager;
+  final bool networkAvailable;
+  final bool bluetoothAvailable;
 
   const HomePage({
     super.key,
@@ -98,6 +121,8 @@ class HomePage extends StatelessWidget {
     required this.biometricStatus,
     required this.availableBiometrics,
     required this.biometricManager,
+    required this.networkAvailable,
+    required this.bluetoothAvailable,
   });
 
   @override
@@ -163,6 +188,19 @@ class HomePage extends StatelessWidget {
                     ),
                   ] else if (isSupported)
                     const Text('未设置任何生物识别'),
+                  const SizedBox(height: 8),
+                  Text(
+                    '网络状态: ${networkAvailable ? "可用" : "不可用"}',
+                    style: TextStyle(
+                      color: networkAvailable ? Colors.green : Colors.red,
+                    ),
+                  ),
+                  Text(
+                    '蓝牙状态: ${bluetoothAvailable ? "可用" : "不可用"}',
+                    style: TextStyle(
+                      color: bluetoothAvailable ? Colors.green : Colors.red,
+                    ),
+                  ),
                 ],
               ),
             ),

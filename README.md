@@ -1,5 +1,15 @@
 # Flutter 生物识别模块
 
+## 使用的插件
+
+本项目使用以下插件：
+
+| 插件名称 | 版本 | 用途 |
+|---------|------|------|
+| local_auth | ^2.3.0 | 生物识别认证（指纹、面容） |
+| connectivity_plus | ^5.0.2 | 网络连接状态监测 |
+| flutter_blue_plus | ^1.10.1 | 蓝牙状态检测 |
+
 ## 包结构（lib/）
 
 ```
@@ -7,6 +17,7 @@ lib/
 ├── flutter_biometric.dart                # 插件主入口
 ├── flutter_biometric_method_channel.dart # MethodChannel 实现
 ├── flutter_biometric_platform_interface.dart # 平台接口定义
+├── connectivity_service.dart             # 网络和蓝牙连接服务
 └── src/
     ├── flutter_biometric.dart            # 结构导出
     ├── biometric/
@@ -105,6 +116,8 @@ Navigator.push(
 - 测试功能支持
 - **指纹验证成功后自动播放烟花动画（纯 Flutter 绘制，无需外部资源）**
 - **人脸预览与验证（原生采集，Flutter 渲染圆形遮罩）**
+- **Network connectivity status monitoring**
+- **Bluetooth status monitoring**
 
 ## 人脸识别/预览功能说明
 
@@ -148,5 +161,28 @@ FaceMaskOverlay(
   hintText: '请将脸部放在框内',
 ),
 ```
+
+## Connectivity Monitoring
+
+```dart
+import 'package:flutter_biometric/connectivity_service.dart';
+
+final connectivity = ConnectivityService();
+
+// Check network status
+bool isNetworkAvailable = await connectivity.isNetworkAvailable();
+
+// Check Bluetooth status
+bool isBluetoothAvailable = await connectivity.isBluetoothAvailable();
+```
+
+## Example App
+
+The example app demonstrates both biometric authentication and connectivity monitoring:
+
+- Shows current network status (available/unavailable)
+- Shows current Bluetooth status (available/unavailable)
+- Updates in real-time when connectivity changes
+- Manual refresh button to check current status
 
 ## 其他功能与架构请参考原有文档
