@@ -1,5 +1,15 @@
 # Flutter 生物识别模块
 
+## 使用的插件
+
+本项目使用以下插件：
+
+| 插件名称 | 版本 | 用途 |
+|---------|------|------|
+| local_auth | ^2.3.0 | 生物识别认证（指纹、面容） |
+| connectivity_plus | ^5.0.2 | 网络连接状态监测 |
+| flutter_blue_plus | ^1.10.1 | 蓝牙状态检测 |
+
 ## 包结构（lib/）
 
 ```
@@ -7,6 +17,7 @@ lib/
 ├── flutter_biometric.dart                # 插件主入口
 ├── flutter_biometric_method_channel.dart # MethodChannel 实现
 ├── flutter_biometric_platform_interface.dart # 平台接口定义
+├── connectivity_service.dart             # 网络和蓝牙连接服务
 └── src/
     ├── flutter_biometric.dart            # 结构导出
     ├── biometric/
