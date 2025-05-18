@@ -1,4 +1,5 @@
 # Flutter 生物识别模块
+![example](https://github.com/lizy-coding/flutter_biometric/blob/master/example/az_recorder_20250518_091943.gif)
 
 ## 使用的插件
 
@@ -105,6 +106,82 @@ Navigator.push(
 - **Manager 层**：如 `biometric_manager.dart`、`face_manager.dart`，负责业务流程、状态管理。
 - **UI 层**：如 `face_preview_page.dart`、`face_mask_overlay.dart`，负责 Flutter 页面与组件。
 - **原生实现**：Android 端如 `FacePreviewHandler.kt`，负责 CameraX 采集、指纹/人脸原生 API 封装。
+
+## 功能流程图
+
+### 指纹识别流程
+
+```mermaid
+sequenceDiagram
+    participant UI as Flutter UI
+    participant BM as BiometricManager
+    participant BS as BiometricService
+    participant MC as MethodChannel
+    participant BP as FlutterBiometricPlugin
+    participant BA as BiometricAuth
+    participant FM as FingerprintManager
+    participant DS as FingerprintDataStore
+    
+    UI->>BM: authenticate(reason)
+    BM->>BS: authenticate(localizedReason)
+    BS->>MC: 调用local_auth库进行生物识别
+    MC->>BP: 通过MethodChannel调用原生方法
+    BP->>BA: authenticate(title, subtitle)
+    BA->>BP: 显示生物识别对话框
+    BP->>UI: 返回验证结果(success/failure)
+    
+    Note over UI,DS: 指纹数据管理流程
+    
+    UI->>BM: addFingerprint(fingerprintHash)
+    BM->>BS: authenticate(reason)
+    BS-->>BM: 验证成功
+    BM->>MC: addFingerprint(fingerprintHash)
+    MC->>BP: 通过MethodChannel调用原生方法
+    BP->>FM: addFingerprint(context, hash)
+    FM->>DS: 存储指纹数据
+    DS-->>FM: 存储结果
+    FM-->>BP: 返回添加结果
+    BP-->>UI: 返回操作结果
+```
+
+### Flutter图像渲染与Android交互流程
+
+```mermaid
+sequenceDiagram
+    participant UI as Flutter UI
+    participant FPP as FacePreviewPage
+    participant FPM as FacePreviewManager
+    participant MC as MethodChannel
+    participant BP as FlutterBiometricPlugin
+    participant FPH as FacePreviewHandler
+    participant CX as CameraX
+    
+    UI->>FPP: 打开人脸预览页面
+    FPP->>FPM: startFacePreview(quality)
+    FPM->>MC: 通过face_channel调用startFacePreview
+    MC->>BP: 调用原生方法
+    BP->>FPH: 创建FacePreviewHandler实例
+    FPH->>CX: 配置相机预览
+    CX->>FPH: 返回SurfaceTexture
+    FPH->>BP: 返回textureId
+    BP->>MC: 返回textureId给Flutter
+    MC->>FPM: 返回textureId
+    FPM->>FPP: 返回textureId
+    FPP->>UI: 使用Texture(textureId)渲染预览
+    
+    Note over UI,CX: 停止预览流程
+    
+    UI->>FPP: 页面关闭/退出
+    FPP->>FPM: stopFacePreview()
+    FPM->>MC: 通过face_channel调用stopFacePreview
+    MC->>BP: 调用原生方法
+    BP->>FPH: stopPreview()
+    FPH->>CX: 释放相机资源
+    FPH->>BP: 释放Surface和纹理
+    BP->>MC: 返回结果
+    MC->>FPM: 返回结果
+    FPM->>FPP: 清理资源
+```
 
 ---
 
